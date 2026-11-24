@@ -7,6 +7,8 @@ spring:
     url: jdbc:mysql://localhost:3306/credit
     username: root
     password: hermes
+  flyway:
+    baseline-on-migrate: true
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
