@@ -3,6 +3,8 @@ package io.github.batchuka.hermes.credit.controller;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +31,13 @@ public class AnalysisController {
 	}
 
 	@PostMapping
-	public Analysis create(@RequestBody Analysis analysis) {
+	public ResponseEntity<?> create(@RequestBody Analysis analysis) {
+
+		if (analysis.getIncome() == null) {
+			return ResponseEntity.badRequest().body(ProblemDetail.forStatusAndDetail(
+					HttpStatus.BAD_REQUEST, "Income is required to score the proposal"));
+		}
+
 		BigDecimal ratio = analysis.getIncome()
 				.divide(analysis.getAmount(), 4, RoundingMode.HALF_UP);
 		int score = Math.min(1000, ratio.multiply(BigDecimal.valueOf(100)).intValue());
@@ -39,7 +47,7 @@ public class AnalysisController {
 
 		analysis.setScore(score);
 		analysis.setCreditLimit(limit);
-		return repository.save(analysis);
+		return ResponseEntity.ok(repository.save(analysis));
 	}
 
 	@PutMapping("/{id}/decision")
