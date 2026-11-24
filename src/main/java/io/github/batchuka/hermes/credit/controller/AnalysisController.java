@@ -1,7 +1,6 @@
 package io.github.batchuka.hermes.credit.controller;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.batchuka.hermes.credit.model.Analysis;
 import io.github.batchuka.hermes.credit.model.Decision;
 import io.github.batchuka.hermes.credit.repository.AnalysisRepository;
+import io.github.batchuka.hermes.credit.service.ScoreCalculator;
 
 @RestController
 @RequestMapping("/analyses")
@@ -53,12 +53,8 @@ public class AnalysisController {
 					HttpStatus.BAD_REQUEST, "Income is required to score the proposal"));
 		}
 
-		BigDecimal ratio = analysis.getIncome()
-				.divide(analysis.getAmount(), 4, RoundingMode.HALF_UP);
-		int score = Math.min(1000, ratio.multiply(BigDecimal.valueOf(100)).intValue());
-		BigDecimal limit = analysis.getIncome()
-				.multiply(BigDecimal.valueOf(0.3))
-				.multiply(BigDecimal.valueOf(analysis.getTermMonths()));
+		int score = ScoreCalculator.score(analysis.getIncome(), analysis.getAmount());
+		BigDecimal limit = ScoreCalculator.limit(analysis.getIncome(), analysis.getTermMonths());
 
 		analysis.setScore(score);
 		analysis.setCreditLimit(limit);
