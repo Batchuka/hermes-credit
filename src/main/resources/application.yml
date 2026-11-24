@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: credit
+  datasource:
+    url: jdbc:mysql://localhost:3306/credit
+    username: root
+    password: hermes
+  jpa:
+    hibernate:
+      ddl-auto: update
