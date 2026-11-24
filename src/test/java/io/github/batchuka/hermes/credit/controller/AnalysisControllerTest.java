@@ -2,6 +2,7 @@ package io.github.batchuka.hermes.credit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -66,4 +67,15 @@ class AnalysisControllerTest {
 				.content("{\"decision\":\"MAYBE\",\"reason\":\"hmm\"}"))
 				.andExpect(status().isBadRequest());
 	}
+
+	@Test
+	void aProposalWithoutIncomeCannotBeScored() throws Exception {
+		mockMvc.perform(post("/analyses").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"farmer\":\"Joao\",\"amount\":120000,\"termMonths\":24}"))
+				.andExpect(status().isBadRequest())
+				.andExpect(jsonPath("$.detail").value("Income is required to score the proposal"));
+
+		verifyNoInteractions(repository);
+	}
+
 }
