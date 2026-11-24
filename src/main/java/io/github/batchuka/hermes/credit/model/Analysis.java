@@ -3,6 +3,8 @@ package io.github.batchuka.hermes.credit.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,6 +25,10 @@ public class Analysis {
 	private Integer score;
 	private BigDecimal creditLimit;
 
+    @Enumerated(EnumType.STRING)
+	private Decision decision;
+	private String reason;
+
 	public Long getId() { return id; }
 
 	public String getFarmer() { return farmer; }
@@ -42,4 +48,11 @@ public class Analysis {
 
 	public BigDecimal getCreditLimit() { return creditLimit; }
 	public void setCreditLimit(BigDecimal creditLimit) { this.creditLimit = creditLimit; }
+
+	public Decision getDecision() { return decision; }
+	public void setDecision(Decision decision) { this.decision = decision; }
+
+	public String getReason() { return reason; }
+	public void setReason(String reason) { this.reason = reason; }
+
 }
