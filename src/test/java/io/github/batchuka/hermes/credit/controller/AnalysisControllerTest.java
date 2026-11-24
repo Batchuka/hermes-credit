@@ -3,11 +3,13 @@ package io.github.batchuka.hermes.credit.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -77,5 +79,35 @@ class AnalysisControllerTest {
 
 		verifyNoInteractions(repository);
 	}
+
+	@Test
+	void listsTheHistoryOfAnalyses() throws Exception {
+		var analysis = new Analysis();
+		analysis.setFarmer("Joao");
+		given(repository.findAll()).willReturn(List.of(analysis));
+
+		mockMvc.perform(get("/analyses"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].farmer").value("Joao"));
+	}
+
+	@Test
+	void findsAnAnalysisById() throws Exception {
+		var analysis = new Analysis();
+		analysis.setFarmer("Joao");
+		given(repository.findById(1L)).willReturn(Optional.of(analysis));
+
+		mockMvc.perform(get("/analyses/1"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.farmer").value("Joao"));
+	}
+
+	@Test
+	void anUnknownAnalysisIsNotFoundWhenRead() throws Exception {
+		given(repository.findById(99L)).willReturn(Optional.empty());
+
+		mockMvc.perform(get("/analyses/99")).andExpect(status().isNotFound());
+	}
+
 
 }
