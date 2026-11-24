@@ -2,10 +2,12 @@ package io.github.batchuka.hermes.credit.controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -28,6 +30,19 @@ public class AnalysisController {
 	}
 
 	record DecisionRequest(Decision decision, String reason) {
+	}
+
+
+	@GetMapping
+	public List<Analysis> list() {
+		return repository.findAll();
+	}
+
+	@GetMapping("/{id}")
+	public ResponseEntity<Analysis> get(@PathVariable Long id) {
+		return repository.findById(id)
+				.map(ResponseEntity::ok)
+				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@PostMapping
