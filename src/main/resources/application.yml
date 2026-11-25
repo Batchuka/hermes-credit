@@ -5,8 +5,8 @@ spring:
     name: credit
   datasource:
     url: jdbc:mysql://localhost:3306/credit
-    username: root
-    password: hermes
+    username: credit
+    password: credit
   flyway:
     baseline-on-migrate: true
   jpa:
