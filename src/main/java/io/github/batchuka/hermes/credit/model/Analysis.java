@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "analyses")
@@ -28,6 +29,8 @@ public class Analysis {
 	@Enumerated(EnumType.STRING)
 	private Decision decision;
 	private String reason;
+	@Version
+	private Long version;
 
 	public Long getId() {
 		return id;
