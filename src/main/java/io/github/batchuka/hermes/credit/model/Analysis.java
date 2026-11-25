@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "analyses")
@@ -25,34 +26,78 @@ public class Analysis {
 	private Integer score;
 	private BigDecimal creditLimit;
 
-    @Enumerated(EnumType.STRING)
+	@Enumerated(EnumType.STRING)
 	private Decision decision;
 	private String reason;
+	@Version
+	private Long version;
 
-	public Long getId() { return id; }
+	public Long getId() {
+		return id;
+	}
 
-	public String getFarmer() { return farmer; }
-	public void setFarmer(String farmer) { this.farmer = farmer; }
+	public String getFarmer() {
+		return farmer;
+	}
 
-	public BigDecimal getIncome() { return income; }
-	public void setIncome(BigDecimal income) { this.income = income; }
+	public void setFarmer(String farmer) {
+		this.farmer = farmer;
+	}
 
-	public BigDecimal getAmount() { return amount; }
-	public void setAmount(BigDecimal amount) { this.amount = amount; }
+	public BigDecimal getIncome() {
+		return income;
+	}
 
-	public Integer getTermMonths() { return termMonths; }
-	public void setTermMonths(Integer termMonths) { this.termMonths = termMonths; }
+	public void setIncome(BigDecimal income) {
+		this.income = income;
+	}
 
-	public Integer getScore() { return score; }
-	public void setScore(Integer score) { this.score = score; }
+	public BigDecimal getAmount() {
+		return amount;
+	}
 
-	public BigDecimal getCreditLimit() { return creditLimit; }
-	public void setCreditLimit(BigDecimal creditLimit) { this.creditLimit = creditLimit; }
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
 
-	public Decision getDecision() { return decision; }
-	public void setDecision(Decision decision) { this.decision = decision; }
+	public Integer getTermMonths() {
+		return termMonths;
+	}
 
-	public String getReason() { return reason; }
-	public void setReason(String reason) { this.reason = reason; }
+	public void setTermMonths(Integer termMonths) {
+		this.termMonths = termMonths;
+	}
+
+	public Integer getScore() {
+		return score;
+	}
+
+	public void setScore(Integer score) {
+		this.score = score;
+	}
+
+	public BigDecimal getCreditLimit() {
+		return creditLimit;
+	}
+
+	public void setCreditLimit(BigDecimal creditLimit) {
+		this.creditLimit = creditLimit;
+	}
+
+	public Decision getDecision() {
+		return decision;
+	}
+
+	public void setDecision(Decision decision) {
+		this.decision = decision;
+	}
+
+	public String getReason() {
+		return reason;
+	}
+
+	public void setReason(String reason) {
+		this.reason = reason;
+	}
 
 }

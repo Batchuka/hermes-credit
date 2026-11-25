@@ -2,6 +2,8 @@ package io.github.batchuka.hermes.credit.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,6 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import io.github.batchuka.hermes.credit.model.Analysis;
+import io.github.batchuka.hermes.credit.model.Decision;
 import io.github.batchuka.hermes.credit.repository.AnalysisRepository;
 
 @WebMvcTest(AnalysisController.class)
@@ -109,5 +112,20 @@ class AnalysisControllerTest {
 		mockMvc.perform(get("/analyses/99")).andExpect(status().isNotFound());
 	}
 
+	@Test
+	void aSecondDecisionIsRefusedWithTheExistingOne() throws Exception {
+		var analysis = new Analysis();
+		analysis.setDecision(Decision.APPROVED);
+		analysis.setReason("ok");
+		given(repository.findById(1L)).willReturn(Optional.of(analysis));
+
+		mockMvc.perform(put("/analyses/1/decision").contentType(MediaType.APPLICATION_JSON)
+				.content("{\"decision\":\"REJECTED\",\"reason\":\"changed my mind\"}"))
+				.andExpect(status().isConflict())
+				.andExpect(jsonPath("$.decision").value("APPROVED"))
+				.andExpect(jsonPath("$.reason").value("ok"));
+
+		verify(repository, never()).save(any(Analysis.class));
+	}
 
 }

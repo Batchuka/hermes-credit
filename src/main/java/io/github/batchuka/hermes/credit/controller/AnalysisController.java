@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +32,6 @@ public class AnalysisController {
 
 	record DecisionRequest(Decision decision, String reason) {
 	}
-
 
 	@GetMapping
 	public List<Analysis> list() {
@@ -62,14 +62,30 @@ public class AnalysisController {
 	}
 
 	@PutMapping("/{id}/decision")
-	public ResponseEntity<Analysis> decide(@PathVariable Long id,@RequestBody DecisionRequest request) {
+	public ResponseEntity<?> decide(@PathVariable Long id, @RequestBody DecisionRequest request) {
 		return repository.findById(id)
 				.map(analysis -> {
+					if (analysis.getDecision() != null) {
+						return alreadyDecided(analysis);
+					}
 					analysis.setDecision(request.decision());
 					analysis.setReason(request.reason());
-					return ResponseEntity.ok(repository.save(analysis));
+					try {
+						return ResponseEntity.ok(repository.save(analysis));
+					} catch (ObjectOptimisticLockingFailureException e) {
+						Analysis winner = repository.findById(id).orElseThrow();
+						return alreadyDecided(winner);
+					}
 				})
 				.orElse(ResponseEntity.notFound().build());
+	}
+
+	private ResponseEntity<ProblemDetail> alreadyDecided(Analysis analysis) {
+		ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+				HttpStatus.CONFLICT, "This analysis was already decided");
+		problem.setProperty("decision", analysis.getDecision());
+		problem.setProperty("reason", analysis.getReason());
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
 	}
 
 }
