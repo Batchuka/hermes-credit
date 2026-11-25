@@ -32,7 +32,6 @@ public class AnalysisController {
 	record DecisionRequest(Decision decision, String reason) {
 	}
 
-
 	@GetMapping
 	public List<Analysis> list() {
 		return repository.findAll();
@@ -62,9 +61,16 @@ public class AnalysisController {
 	}
 
 	@PutMapping("/{id}/decision")
-	public ResponseEntity<Analysis> decide(@PathVariable Long id,@RequestBody DecisionRequest request) {
+	public ResponseEntity<?> decide(@PathVariable Long id, @RequestBody DecisionRequest request) {
 		return repository.findById(id)
 				.map(analysis -> {
+					if (analysis.getDecision() != null) {
+						ProblemDetail problem = ProblemDetail.forStatusAndDetail(
+								HttpStatus.CONFLICT, "This analysis was already decided");
+						problem.setProperty("decision", analysis.getDecision());
+						problem.setProperty("reason", analysis.getReason());
+						return ResponseEntity.status(HttpStatus.CONFLICT).body(problem);
+					}
 					analysis.setDecision(request.decision());
 					analysis.setReason(request.reason());
 					return ResponseEntity.ok(repository.save(analysis));
